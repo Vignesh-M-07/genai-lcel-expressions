@@ -23,49 +23,38 @@ STEP 6: Run the chain with multiple input combinations and analyze structured ou
 
 ### PROGRAM:
 ```
-# 1. Import required libraries
 from langchain.prompts import ChatPromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 
-# 2. Define output schema (Pydantic model)
 class Explanation(BaseModel):
     summary: str = Field(description="Beginner-friendly explanation of the topic")
     length: str = Field(description="Length of explanation: short, medium, or long")
 
 parser = PydanticOutputParser(pydantic_object=Explanation)
 
-# 3. Define the prompt template with two parameters: topic, tone
 prompt = ChatPromptTemplate.from_template(
     "Write a {tone} explanation about {topic} for a beginner audience. "
     "Respond in JSON with fields 'summary' and 'length'."
 )
 
-# 4. Choose the model
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
-# 5. Build the chain with LLMChain (classic style)
-from langchain.chains import LLMChain
+chain = prompt | model | parser
 
-chain = LLMChain(
-    prompt=prompt,
-    llm=model,
-    output_parser=parser
-)
+output1 = chain.invoke({"tone": "funny", "topic": "quantum computing"})
+output2 = chain.invoke({"tone": "simple", "topic": "artificial intelligence"})
+output3 = chain.invoke({"tone": "professional", "topic": "internet of things"})
 
-# 6. Run the chain with different inputs
-output1 = chain.run({"tone": "motivational", "topic": "blockchain"})
-output2 = chain.run({"tone": "casual", "topic": "cloud computing"})
-output3 = chain.run({"tone": "formal", "topic": "cybersecurity in healthcare"})
+print("Funny Quantum Computing:\n", output1, "\n")
+print("Simple Artificial Intelligence:\n", output2, "\n")
+print("Professional IoT:\n", output3)
 
-print("Motivational Blockchain:\n", output1, "\n")
-print("Casual Cloud Computing:\n", output2, "\n")
-print("Formal Cybersecurity:\n", output3)
 ```
 ### OUTPUT:
 
-<img width="1382" height="356" alt="image" src="https://github.com/user-attachments/assets/7678bb37-b33e-4d1f-8cf4-27f92227a3a5" />
+<img width="1330" height="445" alt="Screenshot 2025-09-26 082037" src="https://github.com/user-attachments/assets/e6ef2bae-b473-4806-8faf-57910f7ce13c" />
 
 
 ### RESULT:
